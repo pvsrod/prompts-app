@@ -21,22 +21,59 @@ const PromptCardList = ({ data, handleTagClick }) => {
 };
 
 const Feed = () => {
-	const [searchText, setSearchText] = useState("");
-	const [posts, setPosts] = useState([]);
+	const [allPosts, setAllPosts] = useState([]); //stores the array with all the post
 
-	const handleSearchChange = (e) => {};
+	//Search states
+	const [searchText, setSearchText] = useState(""); //state linked to the controled search input
+	const [searchTimeout, setSearchTimeout] = useState(null); //this state controls the debounce function (resets the timer after each key stroke in the search input)
+	const [searchedResults, setSearchedResults] = useState([]); //stores the array of the filtered posts
 
-	//we fetch the "prompts" data in the useEffect
+	//function that fetches all the posts
+	const fetchPosts = async () => {
+		const response = await fetch("/api/prompt"); //this gets defaulted automatically to the GET function in "/api/prompt/route.js"
+		const data = await response.json();
+		setAllPosts(data);
+	};
+
+	//we fetch all the prompts at loading time
 	useEffect(() => {
-		const fetchPosts = async () => {
-			const response = await fetch("/api/prompt");
-			const data = await response.json();
-
-			setPosts(data);
-		};
-
 		fetchPosts();
 	}, []);
+
+	//Function that filters the promps according to the search input (searchText), returns an array with the filtered prompts
+	const filterPrompts = (searchText) => {
+		console.log("called");
+		//RegExp is a JS function to filter strings with a regular expresion
+		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+		const regex = new RegExp(searchText, "i"); //in this case the "regular expresion" is just the text we want to search in the string. The "i" flag is for case-insensitive search
+		return allPosts.filter(
+			(item) =>
+				regex.test(item.creator.username) ||
+				regex.test(item.tag) ||
+				regex.test(item.prompt)
+		); //".test(string)" tests the "regular expresion" against the "string", returns true if found
+	};
+
+	//this is the function applied on the "onChange" event in the search input
+	//it implements the debounce method to avoid unnecessary calls while typing
+	const handleSearchChange = (e) => {
+		clearTimeout(searchTimeout); //the timer resets on every key stroke
+		setSearchText(e.target.value); //this updates the input(it's value is linked to the "searchText" state value)
+
+		setSearchTimeout(
+			setTimeout(() => {
+				const searcResult = filterPrompts(e.target.value);
+				setSearchedResults(searcResult);
+			}, 500)
+		);
+	};
+
+	//Manages the "tag click" event (filters by tag), the "tagName" value is passed to the function when invoked from the "PromptCard" component
+	const handleTagClick = (tagName) => {
+		setSearchText(tagName);
+		const searchResult = filterPrompts(tagName);
+		setSearchedResults(searchResult);
+	};
 
 	return (
 		<section className='feed'>
@@ -51,7 +88,15 @@ const Feed = () => {
 				/>
 			</form>
 
-			<PromptCardList data={posts} handleTagClick={() => {}} />
+			{/* */}
+			{searchText ? (
+				<PromptCardList
+					data={searchedResults}
+					handleTagClick={handleTagClick}
+				/>
+			) : (
+				<PromptCardList data={allPosts} handleTagClick={handleTagClick} />
+			)}
 		</section>
 	);
 };
