@@ -68,7 +68,7 @@ const Nav = () => {
 										height={20}
 										alt='provider'
 									/>
-									Sign In with
+									Sign In
 								</button>
 							))}
 					</>
@@ -123,7 +123,7 @@ const Nav = () => {
 									key={provider.name}
 									onClick={() => signIn(provider.id)}>
 									<Image
-										src={`/assets/images/${provider.name}.svg`}
+										src={`/assets/images/${provider.name.toLowerCase()}.svg`}
 										className='rounded-full mr-2'
 										width={20}
 										height={20}
