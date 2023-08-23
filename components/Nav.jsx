@@ -62,13 +62,13 @@ const Nav = () => {
 									key={provider.name}
 									onClick={() => signIn(provider.id)}>
 									<Image
-										src={`/assets/images/${provider.name}.svg`}
+										src={`/assets/images/${provider.name.toLowerCase()}.svg`}
 										className='rounded-full mr-2'
 										width={20}
 										height={20}
 										alt='provider'
 									/>
-									Sign In
+									Sign In with
 								</button>
 							))}
 					</>
