@@ -42,7 +42,6 @@ const Feed = () => {
 
 	//Function that filters the promps according to the search input (searchText), returns an array with the filtered prompts
 	const filterPrompts = (searchText) => {
-		console.log("called");
 		//RegExp is a JS function to filter strings with a regular expresion
 		//https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 		const regex = new RegExp(searchText, "i"); //in this case the "regular expresion" is just the text we want to search in the string. The "i" flag is for case-insensitive search

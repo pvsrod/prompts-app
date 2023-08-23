@@ -3,6 +3,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 import { usePathname, useRouter } from "next/navigation";
+import Link from "next/link";
 
 const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
 	const pathName = usePathname(); //usePathname returns the current path (e.g. for home it returns "/", "/profile",etc)
@@ -17,10 +18,18 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
 		setTimeout(() => setCopied(""), 3000); //we set "copied" back to "" so the checkmark icon disapears after 3 seconds
 	};
 
+	//all this function does is redirects the page to either "my own profile page" or "someone else's profile page" (in case I click on one of my own prompts I should be redirected to my own page with edit/delete capabilities)
+	const handleProfileClick = () => {
+		if (post.creator._id === session?.user.id) return router.push("/profile");
+		router.push(`/profile/${post.creator._id}?name=${post.creator.username}`);
+	};
+
 	return (
 		<div className='prompt_card'>
 			<div className='flex justify-between items-start gap-5'>
-				<div className='flex-1 flex justify-start items-center gap-3 cursor-pointer'>
+				<div
+					className='flex-1 flex justify-start items-center gap-3 cursor-pointer'
+					onClick={handleProfileClick}>
 					<Image
 						src={post.creator.image}
 						alt='user_image'
@@ -41,12 +50,12 @@ const PromptCard = ({ post, handleTagClick, handleEdit, handleDelete }) => {
 					<Image
 						src={
 							copied === post.prompt
-								? "assets/icons/tick.svg"
-								: "assets/icons/copy.svg"
+								? "/assets/icons/tick.svg"
+								: "/assets/icons/copy.svg"
 						}
 						width={12}
 						height={12}
-						alt='copy'
+						alt={copied === post.prompt ? "tick_icon" : "copy_icon"}
 					/>
 				</div>
 			</div>
